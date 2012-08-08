@@ -49,7 +49,7 @@ public class BusTest {
     StringCatcher catcher = new StringCatcher();
     bus.register(catcher);
 
-    Set<EventHandler> wrappers = bus.getHandlersForEventType(String.class);
+    Set<Subscriber> wrappers = bus.getHandlersForEventType(String.class);
     assertNotNull("Should have at least one method registered.", wrappers);
     assertEquals("One method should be registered.", 1, wrappers.size());
 
@@ -301,7 +301,7 @@ public class BusTest {
     bus.register(new ExceptionThrowingHandler());
     try {
       bus.post("I love tacos");
-      fail("Should have failed due to exception-throwing handler.");
+      fail("Should have failed due to exception-throwing subscriber.");
     } catch (RuntimeException e) {
       // Expected
     }

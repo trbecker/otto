@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.squareup.otto;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.squareup.otto.internal;
 
 /**
- * Marks a method as an instance producer, as used by {@link ReflectionFinder} and {@link Bus}.
- * <p>
- * The type of instance will be indicated by the method's return type parameter. Producer methods
- * may return null when there is no appropriate value to share. The calling {@link Bus} will ignore
- * such returns and post nothing.
+ * Base class for generated {@link com.squareup.otto.Producer} and {@link com.squareup.otto.Subscriber} implementations
+ * which hold a reference to a target object.
  *
  * @author Jake Wharton
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface Produce {
+public abstract class Target<T> {
+  protected final T target;
+
+  protected Target(T target) {
+    this.target = target;
+  }
 }
