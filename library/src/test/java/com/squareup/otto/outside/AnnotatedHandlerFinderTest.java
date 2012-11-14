@@ -137,6 +137,124 @@ public class AnnotatedHandlerFinderTest {
     }
   }
 
+  public static class AnnotatedInSuperclassWithHierarchyLoadingTest 
+  extends AbstractEventBusTest<AnnotatedInSuperclassWithHierarchyLoadingTest.SubClass> {
+    @Before @Override
+    public void setUp() throws Exception {
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "true");
+      super.setUp();
+    }
+
+    @After @Override
+    public void tearDown() throws Exception {
+      super.tearDown();
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "false");
+    }
+
+    static class SuperClass {
+      public List<Object> annotatedInSuperClassEvents = new ArrayList<Object>();
+
+      @Subscribe
+      public void superclassEventReceiver(Object object) {
+        annotatedInSuperClassEvents.add(object);
+      }
+    }
+
+    static class SubClass extends SuperClass {
+      /* Empty */
+    }
+
+    @Override
+    SubClass createHandler() {
+      return new SubClass();
+    }
+
+    @Test
+    public void annotatedInSuperClassWithHierarchyEventReceivedTest() {
+      assertThat(getHandler().annotatedInSuperClassEvents).containsExactly(EVENT);
+    }
+  }
+
+  public static class AnnotatedInSuperclassButOverrideninSubclassWithHierarchyLoadingTest 
+  extends AbstractEventBusTest<AnnotatedInSuperclassButOverrideninSubclassWithHierarchyLoadingTest.SubClass> {
+    @Before @Override
+    public void setUp() throws Exception {
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "true");
+      super.setUp();
+    }
+
+    @After @Override
+    public void tearDown() throws Exception {
+      super.tearDown();
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "false");
+    }
+
+    static class SuperClass {
+      public List<Object> annotatedInSuperClassEvents = new ArrayList<Object>();
+
+      @Subscribe
+      public void superclassEventReceiver(Object object) {
+        annotatedInSuperClassEvents.add(object);
+      }
+    }
+
+    static class SubClass extends SuperClass {
+      @Override
+      public void superclassEventReceiver(Object object) {
+        super.superclassEventReceiver(object);
+      }
+    }
+
+    @Override
+    SubClass createHandler() {
+      return new SubClass();
+    }
+
+    @Test
+    public void annotatedInSuperClassWithHierarchyEventReceivedTest() {
+      assertThat(getHandler().annotatedInSuperClassEvents).isEmpty();
+    }
+  }
+
+  public static class AnnotatedInAbstractSuperclassWithHierarchyLoadingTest 
+  extends AbstractEventBusTest<AnnotatedInAbstractSuperclassWithHierarchyLoadingTest.SubClass> {
+    @Before @Override
+    public void setUp() throws Exception {
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "true");
+      super.setUp();
+    }
+
+    @After @Override
+    public void tearDown() throws Exception {
+      super.tearDown();
+      System.setProperty(Bus.TRAVERSE_CLASS_HIERARCHY, "false");
+    }
+
+    static abstract class SuperClass {
+      public List<Object> annotatedInSuperClassEvents = new ArrayList<Object>();
+
+      @Subscribe
+      public abstract void superclassEventReceiver(Object object);
+    }
+
+    static class SubClass extends SuperClass {
+      @Override
+      public void superclassEventReceiver(Object object) {
+        annotatedInSuperClassEvents.add(object);
+      }
+    }
+
+    @Override
+    SubClass createHandler() {
+      return new SubClass();
+    }
+
+    @Test
+    public void annotatedInSuperClassWithHierarchyEventReceivedTest() {
+      assertThat(getHandler().annotatedInSuperClassEvents).isEmpty();
+    }
+  }
+  
   public static class NeitherAbstractNorAnnotatedInSuperclassTest
       extends AbstractEventBusTest<NeitherAbstractNorAnnotatedInSuperclassTest.SubClass> {
     static class SuperClass {

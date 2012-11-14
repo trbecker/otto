@@ -32,7 +32,6 @@ import java.util.Set;
  * @author Jake Wharton
  */
 final class AnnotatedHandlerFinder {
-
   /** Cache event bus producer methods for each class. */
   private static final Map<Class<?>, Map<Class<?>, Method>> PRODUCERS_CACHE =
       new HashMap<Class<?>, Map<Class<?>, Method>>();
@@ -42,6 +41,27 @@ final class AnnotatedHandlerFinder {
       new HashMap<Class<?>, Map<Class<?>, Set<Method>>>();
 
   /**
+   * Returns the <code>clazz</code> methods.
+   * 
+   * The system property {@link Bus#TRAVERSE_CLASS_HIERARCHY} changes the behavior of this
+   * method: if set to true, the method will include the superclasses of <code>clazz</code>
+   * in the returned methods, if they're not overriden without the {@link Subscribe}
+   * annotation. Otherwise, it'll only return the methods in the immediate class.
+   *  
+   * @param clazz the class to be inspected
+   * @return the methods of the class. Will include methods in the superclasses if 
+   * {@link Bus#TRAVERSE_CLASS_HIERARCHY} is set to true.
+   */
+  private static final Method[] getListenerMethods(Class<?> clazz) {
+    boolean traverseClassHierarchy = Boolean.parseBoolean(System.getProperty(Bus.TRAVERSE_CLASS_HIERARCHY));
+    if (traverseClassHierarchy) {
+      return clazz.getMethods();
+    } else {
+      return clazz.getDeclaredMethods();
+    }
+  }
+
+  /**
    * Load all methods annotated with {@link Produce} or {@link Subscribe} into their respective caches for the
    * specified class.
    */
@@ -49,7 +69,7 @@ final class AnnotatedHandlerFinder {
     Map<Class<?>, Set<Method>> subscriberMethods = new HashMap<Class<?>, Set<Method>>();
     Map<Class<?>, Method> producerMethods = new HashMap<Class<?>, Method>();
 
-    for (Method method : listenerClass.getDeclaredMethods()) {
+    for (Method method : getListenerMethods(listenerClass)) {
       if (method.isAnnotationPresent(Subscribe.class)) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length != 1) {

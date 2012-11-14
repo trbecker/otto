@@ -87,6 +87,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class Bus {
   public static final String DEFAULT_IDENTIFIER = "default";
+  
+  /**
+   * The name of a system property. If set to true (with {@link System#setProperty(String, String)},
+   * it changes the default behavior of the discovery of producers and subscribers. The discovery
+   * will include methods in superclasses, if they're not overriden without the {@link Subscribe}
+   * annotation.
+   */
+  public static final String TRAVERSE_CLASS_HIERARCHY = "com.squareup.otto.traverse_hierarchy";
 
   /** All registered event handlers, indexed by event type. */
   private final ConcurrentMap<Class<?>, Set<EventHandler>> handlersByType =
